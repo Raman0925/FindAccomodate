@@ -1,63 +1,70 @@
+import {observer} from 'mobx-react-lite';
 import {Pressable, Text, View, type ViewStyle} from 'react-native';
 import type {Theme} from '../theme';
-import {useNavigation, useRoute} from '@react-navigation/native';
 import {Screen} from '../components/screen';
 import {useAppTheme} from '../utils/useAppTheme';
 import responsive from '../theme/responsive';
-import type {AppStackScreenProps} from '../navigators/AppStackParamList';
+import {uiStore} from '../models';
 
-type Props = AppStackScreenProps<'Details'>;
-
-export function DetailsScreen(_props: Props) {
-  const navigation = useNavigation();
-  const route = useRoute<Props['route']>();
+export const ExploreScreen = observer(function ExploreScreen() {
   const {themed, theme} = useAppTheme();
-  const title = route.params?.title ?? 'Details';
-
   const pad = responsive.useResponsiveSpacing(theme.spacing.md);
-  const fontSize = responsive.useResponsiveFontSize(16);
+  const body = responsive.useResponsiveFontSize(16);
+  const titleSize = responsive.useResponsiveFontSize(22);
 
   return (
-    <Screen preset="fixed" backgroundColor={theme.colors.background}>
+    <Screen preset="scroll" backgroundColor={theme.colors.background}>
       <View style={{padding: pad, gap: pad}}>
         <Text
           style={themed(t => ({
-            fontSize: responsive.responsiveFontSize(22),
+            fontSize: titleSize,
             fontFamily: t.typography.bricolage.bold,
             color: t.colors.text,
           }))}>
-          {title}
+          Explore
         </Text>
         <Text
           style={themed(t => ({
-            fontSize,
+            fontSize: body,
             fontFamily: t.typography.bricolage.normal,
             color: t.colors.textDim,
           }))}>
-          Native stack screen with shared theme.
+          MobX State Tree: home tab taps tracked in shared{' '}
+          <Text style={{fontFamily: theme.typography.bricolage.bold}}>
+            uiStore
+          </Text>
+          .
+        </Text>
+        <Text
+          style={themed(t => ({
+            fontSize: body,
+            fontFamily: t.typography.bricolage.medium,
+            color: t.colors.tint,
+          }))}>
+          Count: {uiStore.homeTapCount}
         </Text>
         <Pressable
-          onPress={() => navigation.goBack()}
+          onPress={() => uiStore.resetHomeTaps()}
           style={themed(
             (t: Theme): ViewStyle => ({
-              borderWidth: 1,
-              borderColor: t.colors.border,
+              alignSelf: 'flex-start',
               paddingVertical: t.spacing.sm,
               paddingHorizontal: t.spacing.md,
               borderRadius: 8,
-              alignSelf: 'flex-start',
+              borderWidth: 1,
+              borderColor: t.colors.border,
             }),
           )}>
           <Text
             style={themed(t => ({
-              color: t.colors.tint,
               fontFamily: t.typography.bricolage.medium,
-              fontSize,
+              fontSize: body,
+              color: t.colors.tint,
             }))}>
-            Back
+            Reset count
           </Text>
         </Pressable>
       </View>
     </Screen>
   );
-}
+});

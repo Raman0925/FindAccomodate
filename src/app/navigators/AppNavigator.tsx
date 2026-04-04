@@ -3,7 +3,8 @@ import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {useAppTheme, useThemeProvider} from '../utils/useAppTheme';
 import type {AppStackParamList} from './AppStackParamList';
-import {HomeScreen, DetailsScreen} from '../screens';
+import {DetailsScreen} from '../screens';
+import {MainTabNavigator} from './MainTabNavigator';
 
 const Stack = createNativeStackNavigator<AppStackParamList>();
 
@@ -14,13 +15,13 @@ function AppStack() {
 
   return (
     <Stack.Navigator
-      initialRouteName="Home"
+      initialRouteName="MainTabs"
       screenOptions={{
         headerShown: false,
         navigationBarColor: colors.background,
         contentStyle: {backgroundColor: colors.background},
       }}>
-      <Stack.Screen name="Home" component={HomeScreen} />
+      <Stack.Screen name="MainTabs" component={MainTabNavigator} />
       <Stack.Screen name="Details" component={DetailsScreen} />
     </Stack.Navigator>
   );
