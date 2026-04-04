@@ -111,3 +111,15 @@ export function clear(): void {
     storage.clearAll();
   } catch {}
 }
+
+export const supabaseAuthStorage = {
+  getItem: (key: string) => Promise.resolve(loadString(key)),
+  setItem: (key: string, value: string) => {
+    saveString(key, value);
+    return Promise.resolve();
+  },
+  removeItem: (key: string) => {
+    remove(key);
+    return Promise.resolve();
+  },
+};

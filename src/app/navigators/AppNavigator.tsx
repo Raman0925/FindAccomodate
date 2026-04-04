@@ -4,7 +4,7 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import BootSplash from 'react-native-bootsplash';
 import {useAppTheme, useThemeProvider} from '../utils/useAppTheme';
 import type {AppStackParamList} from './AppStackParamList';
-import {DetailsScreen} from '../screens';
+import {DetailsScreen, WelcomeScreen} from '../screens';
 import {MainTabNavigator} from './MainTabNavigator';
 
 const Stack = createNativeStackNavigator<AppStackParamList>();
@@ -16,12 +16,13 @@ function AppStack() {
 
   return (
     <Stack.Navigator
-      initialRouteName="MainTabs"
+      initialRouteName="Welcome"
       screenOptions={{
         headerShown: false,
         navigationBarColor: colors.background,
         contentStyle: {backgroundColor: colors.background},
       }}>
+      <Stack.Screen name="Welcome" component={WelcomeScreen} />
       <Stack.Screen name="MainTabs" component={MainTabNavigator} />
       <Stack.Screen name="Details" component={DetailsScreen} />
     </Stack.Navigator>
