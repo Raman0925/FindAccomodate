@@ -17,7 +17,24 @@
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
-      "prettier --write",
+      "prettier --write"
+    ],
+    "src/**/*.{js,jsx,ts,tsx}": [
+      "eslint --max-warnings=0 --fix"
+    ],
+    "App.tsx": [
+      "eslint --max-warnings=0 --fix"
+    ],
+    "index.js": [
+      "eslint --max-warnings=0 --fix"
+    ],
+    "jest.setup.js": [
+      "eslint --max-warnings=0 --fix"
+    ],
+    "__tests__/**/*.{js,jsx,ts,tsx}": [
+      "eslint --max-warnings=0 --fix"
+    ],
+    "__mocks__/**/*.{js,jsx,ts,tsx}": [
       "eslint --max-warnings=0 --fix"
     ],
     "*.{json,md}": [
