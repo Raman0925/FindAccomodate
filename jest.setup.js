@@ -9,6 +9,7 @@ jest.mock('react-native-keyboard-controller', () => {
     KeyboardAvoidingView: RNKAV,
   } = require('react-native');
   return {
+    KeyboardProvider: ({children}) => children,
     KeyboardAvoidingView: RNKAV,
     KeyboardAwareScrollView: ScrollView,
     KeyboardStickyView: View,

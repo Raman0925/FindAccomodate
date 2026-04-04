@@ -1,6 +1,7 @@
 buildscript {
     ext {
-        buildToolsVersion = "36.0.0"
+        // Use installed revision (36.0.0 stable may not be installed; rc5 matches common SDK setups)
+        buildToolsVersion = "36.0.0-rc5"
         minSdkVersion = 24
         compileSdkVersion = 36
         targetSdkVersion = 36
