@@ -1,6 +1,7 @@
-import {ComponentProps} from 'react';
+import {ComponentProps, useCallback} from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import BootSplash from 'react-native-bootsplash';
 import {useAppTheme, useThemeProvider} from '../utils/useAppTheme';
 import type {AppStackParamList} from './AppStackParamList';
 import {DetailsScreen} from '../screens';
@@ -32,12 +33,21 @@ export type AppNavigationProps = Partial<
 >;
 
 export function AppNavigator(props: AppNavigationProps) {
+  const {onReady, ...navigationProps} = props;
   const {navigationTheme, ThemeProvider, themeScheme, setThemeContextOverride} =
     useThemeProvider();
 
+  const handleReady = useCallback(() => {
+    onReady?.();
+    BootSplash.hide({fade: true}).catch(() => {});
+  }, [onReady]);
+
   return (
     <ThemeProvider value={{themeScheme, setThemeContextOverride}}>
-      <NavigationContainer theme={navigationTheme} {...props}>
+      <NavigationContainer
+        theme={navigationTheme}
+        {...navigationProps}
+        onReady={handleReady}>
         <AppStack />
       </NavigationContainer>
     </ThemeProvider>
