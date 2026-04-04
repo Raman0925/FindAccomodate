@@ -1,6 +1,82 @@
 import 'react-native-gesture-handler/jestSetup';
 
+jest.mock('./src/app/services/supabase/client', () => {
+  const subscription = {unsubscribe: jest.fn()};
+  return {
+    supabase: {
+      auth: {
+        getSession: jest.fn(() =>
+          Promise.resolve({data: {session: null}, error: null}),
+        ),
+        onAuthStateChange: jest.fn(() => ({
+          data: {subscription},
+        })),
+        signInWithIdToken: jest.fn(() =>
+          Promise.resolve({data: {session: null}, error: null}),
+        ),
+        signOut: jest.fn(() => Promise.resolve({error: null})),
+        startAutoRefresh: jest.fn(),
+        stopAutoRefresh: jest.fn(),
+      },
+    },
+    isSupabaseConfigured: () => true,
+  };
+});
+
 jest.mock('react-dom');
+
+jest.mock('react-native-keychain', () => ({
+  ACCESSIBLE: {
+    WHEN_UNLOCKED_THIS_DEVICE_ONLY: 'AccessibleWhenUnlockedThisDeviceOnly',
+  },
+  getGenericPassword: jest.fn(() => Promise.resolve(false)),
+  setGenericPassword: jest.fn(() =>
+    Promise.resolve({service: 'test', storage: 'test'}),
+  ),
+  resetGenericPassword: jest.fn(() => Promise.resolve(true)),
+}));
+
+jest.mock('@react-native-google-signin/google-signin', () => ({
+  GoogleSignin: {
+    configure: jest.fn(),
+    hasPlayServices: jest.fn(() => Promise.resolve(true)),
+    signIn: jest.fn(() =>
+      Promise.resolve({
+        type: 'success',
+        data: {
+          user: {
+            id: '1',
+            name: 'Test',
+            email: 't@test.com',
+            photo: null,
+            familyName: null,
+            givenName: null,
+          },
+          scopes: [],
+          idToken: 'mock-id-token',
+          serverAuthCode: null,
+        },
+      }),
+    ),
+    getTokens: jest.fn(() =>
+      Promise.resolve({
+        idToken: 'mock-id-token',
+        accessToken: 'mock-access-token',
+      }),
+    ),
+    signOut: jest.fn(() => Promise.resolve(null)),
+    revokeAccess: jest.fn(() => Promise.resolve(null)),
+  },
+  statusCodes: {
+    SIGN_IN_CANCELLED: 'SIGN_IN_CANCELLED',
+    IN_PROGRESS: 'IN_PROGRESS',
+    PLAY_SERVICES_NOT_AVAILABLE: 'PLAY_SERVICES_NOT_AVAILABLE',
+    SIGN_IN_REQUIRED: 'SIGN_IN_REQUIRED',
+  },
+  isErrorWithCode: jest.fn(
+    e => typeof e === 'object' && e !== null && 'code' in e,
+  ),
+}));
 
 jest.mock('react-native-bootsplash', () => ({
   hide: jest.fn(() => Promise.resolve()),

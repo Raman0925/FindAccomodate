@@ -1,35 +1,140 @@
-import {useCallback, useState} from 'react';
-import {ActivityIndicator, Image, StyleSheet, Text, View} from 'react-native';
-import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import {useNavigation} from '@react-navigation/native';
+import {
+  ActivityIndicator,
+  Image,
+  Text,
+  View,
+  type ImageStyle,
+  type TextStyle,
+  type ViewStyle,
+} from 'react-native';
+import {observer} from 'mobx-react-lite';
 import {Button, type ButtonAccessoryProps} from '../components/Button';
+import {useAuth} from '../hooks/useAuth';
 import {Screen} from '../components/screen';
-import {useAppTheme} from '../utils/useAppTheme';
+import type {ThemedStyle, Theme} from '../theme';
 import responsive from '../theme/responsive';
+import {showAuthSetupRequiredFeedback} from '../utils/showAuthSetupRequiredFeedback';
+import {useAppTheme} from '../utils/useAppTheme';
 import {appIcon} from '../../assets/icons';
-import type {AppStackParamList} from '../navigators/AppStackParamList';
 
-type WelcomeNav = NativeStackNavigationProp<AppStackParamList, 'Welcome'>;
+const themedWelcomeColumn: ThemedStyle<ViewStyle> = (_theme: Theme) => ({
+  flex: 1,
+  justifyContent: 'space-between',
+});
 
-function GoogleMarkAccessory({style}: ButtonAccessoryProps) {
+const themedWelcomeHeaderBlock: ThemedStyle<ViewStyle> = (theme: Theme) => ({
+  alignItems: 'center',
+  gap: theme.spacing.md,
+});
+
+function createThemedRootPadding(
+  padHorizontal: number,
+  padTop: number,
+  padBottom: number,
+): ThemedStyle<ViewStyle> {
+  const applyRootPadding: ThemedStyle<ViewStyle> = (_theme: Theme) => ({
+    paddingHorizontal: padHorizontal,
+    paddingTop: padTop,
+    paddingBottom: padBottom,
+  });
+  return applyRootPadding;
+}
+
+function createThemedHeroIcon(
+  size: number,
+  radius: number,
+): ThemedStyle<ImageStyle> {
+  const applyHeroIcon: ThemedStyle<ImageStyle> = (_theme: Theme) => ({
+    width: size,
+    height: size,
+    borderRadius: radius,
+  });
+  return applyHeroIcon;
+}
+
+function createThemedTitle(fontSize: number): ThemedStyle<TextStyle> {
+  const applyTitle: ThemedStyle<TextStyle> = (theme: Theme) => ({
+    fontSize,
+    fontFamily: theme.typography.bricolage.bold,
+    color: theme.colors.text,
+    textAlign: 'center',
+  });
+  return applyTitle;
+}
+
+function createThemedSubtitle(fontSize: number): ThemedStyle<TextStyle> {
+  const applySubtitle: ThemedStyle<TextStyle> = (theme: Theme) => ({
+    fontSize,
+    fontFamily: theme.typography.bricolage.normal,
+    color: theme.colors.textDim,
+    textAlign: 'center',
+  });
+  return applySubtitle;
+}
+
+function createThemedAuthErrorLabel(fontSize: number): ThemedStyle<TextStyle> {
+  const applyAuthErrorLabel: ThemedStyle<TextStyle> = (theme: Theme) => ({
+    fontSize,
+    fontFamily: theme.typography.bricolage.normal,
+    color: theme.colors.error,
+    textAlign: 'center',
+    marginBottom: theme.spacing.sm,
+  });
+  return applyAuthErrorLabel;
+}
+
+function createThemedGoogleSignInButton(
+  isBusy: boolean,
+): ThemedStyle<ViewStyle> {
+  const applyGoogleSignInButton: ThemedStyle<ViewStyle> = (theme: Theme) => ({
+    borderRadius: 12,
+    paddingVertical: theme.spacing.md,
+    paddingHorizontal: theme.spacing.lg,
+    gap: theme.spacing.sm,
+    opacity: isBusy ? 0.7 : 1,
+  });
+  return applyGoogleSignInButton;
+}
+
+function createThemedGoogleButtonText(
+  fontSize: number,
+): ThemedStyle<TextStyle> {
+  const applyGoogleButtonText: ThemedStyle<TextStyle> = (theme: Theme) => ({
+    fontSize,
+    fontFamily: theme.typography.bricolage.medium,
+    color: theme.colors.text,
+  });
+  return applyGoogleButtonText;
+}
+
+const themedWelcomeActions: ThemedStyle<ViewStyle> = (_theme: Theme) => ({
+  width: '100%',
+});
+
+const themedGoogleMark: ThemedStyle<TextStyle> = (_theme: Theme) => ({
+  fontSize: 20,
+});
+
+const GoogleMarkAccessoryView = (props: ButtonAccessoryProps) => {
+  const {themed} = useAppTheme();
   return (
-    <View style={style}>
-      <Text style={styles.googleMark}>G</Text>
+    <View style={props.style}>
+      <Text style={themed(themedGoogleMark)}>G</Text>
     </View>
   );
-}
+};
 
-/**
- * Stub: replace with `@react-native-google-signin/google-signin` + your web client ID.
- */
-async function signInWithGoogleStub(): Promise<void> {
-  await new Promise<void>(r => setTimeout(r, 600));
-}
+const GoogleMarkAccessory = observer(GoogleMarkAccessoryView);
 
-export function WelcomeScreen() {
-  const navigation = useNavigation<WelcomeNav>();
+const WelcomeScreenView = () => {
   const {themed, theme} = useAppTheme();
-  const [busy, setBusy] = useState(false);
+  const {
+    handleGoogleLogin,
+    isAuthenticating,
+    friendlyError,
+    clearAuthError,
+    canAttemptGoogleLogin,
+  } = useAuth();
 
   const titleSize = responsive.useResponsiveFontSize({
     base: 26,
@@ -37,103 +142,67 @@ export function WelcomeScreen() {
     md: 30,
   });
   const bodySize = responsive.useResponsiveFontSize(16);
+  const errorSize = responsive.useResponsiveFontSize(14);
+
   const pad = responsive.useResponsiveSpacing(theme.spacing.lg);
   const padTop = responsive.useResponsiveSpacing(theme.spacing.xl);
   const iconSize = responsive.useResponsiveSpacing(100);
   const iconRadius = responsive.useResponsiveSpacing(22);
 
-  const onGooglePress = useCallback(async () => {
-    if (busy) {
+  const handleGooglePress = () => {
+    if (isAuthenticating) {
       return;
     }
-    setBusy(true);
-    try {
-      await signInWithGoogleStub();
-      navigation.reset({
-        index: 0,
-        routes: [{name: 'MainTabs'}],
-      });
-    } finally {
-      setBusy(false);
+    clearAuthError();
+    if (!canAttemptGoogleLogin) {
+      showAuthSetupRequiredFeedback();
+      return;
     }
-  }, [busy, navigation]);
+    handleGoogleLogin();
+  };
 
   return (
     <Screen preset="fixed" backgroundColor={theme.colors.background}>
       <View
         style={[
-          styles.column,
-          {
-            paddingHorizontal: pad,
-            paddingTop: padTop,
-            paddingBottom: pad,
-          },
+          themed(themedWelcomeColumn),
+          themed(createThemedRootPadding(pad, padTop, pad)),
         ]}>
-        <View style={[styles.headerBlock, {gap: theme.spacing.md}]}>
+        <View style={themed(themedWelcomeHeaderBlock)}>
           <Image
             source={appIcon}
-            style={{
-              width: iconSize,
-              height: iconSize,
-              borderRadius: iconRadius,
-            }}
+            style={themed(createThemedHeroIcon(iconSize, iconRadius))}
             resizeMode="cover"
           />
-          <Text
-            style={themed(t => ({
-              fontSize: titleSize,
-              fontFamily: t.typography.bricolage.bold,
-              color: t.colors.text,
-              textAlign: 'center',
-            }))}>
-            Welcome
-          </Text>
-          <Text
-            style={themed(t => ({
-              fontSize: bodySize,
-              fontFamily: t.typography.bricolage.normal,
-              color: t.colors.textDim,
-              textAlign: 'center',
-            }))}>
+          <Text style={themed(createThemedTitle(titleSize))}>Welcome</Text>
+          <Text style={themed(createThemedSubtitle(bodySize))}>
             Sign in to continue to AccoNetwork
           </Text>
         </View>
 
-        <Button
-          accessibilityLabel="Sign in with Google"
-          disabled={busy}
-          onPress={onGooglePress}
-          preset="default"
-          text={busy ? '' : 'Sign in with Google'}
-          LeftAccessory={busy ? undefined : GoogleMarkAccessory}
-          textStyle={themed(t => ({
-            fontSize: bodySize,
-            fontFamily: t.typography.bricolage.medium,
-            color: t.colors.text,
-          }))}
-          style={themed(t => ({
-            borderRadius: 12,
-            paddingVertical: t.spacing.md,
-            paddingHorizontal: t.spacing.lg,
-            gap: t.spacing.sm,
-            opacity: busy ? 0.7 : 1,
-          }))}>
-          {busy ? <ActivityIndicator color={theme.colors.text} /> : null}
-        </Button>
+        <View style={themed(themedWelcomeActions)}>
+          {friendlyError ? (
+            <Text style={themed(createThemedAuthErrorLabel(errorSize))}>
+              {friendlyError}
+            </Text>
+          ) : null}
+          <Button
+            accessibilityLabel="Sign in with Google"
+            disabled={isAuthenticating}
+            onPress={handleGooglePress}
+            preset="default"
+            text={isAuthenticating ? '' : 'Sign in with Google'}
+            LeftAccessory={isAuthenticating ? undefined : GoogleMarkAccessory}
+            textStyle={themed(createThemedGoogleButtonText(bodySize))}
+            style={themed(createThemedGoogleSignInButton(isAuthenticating))}>
+            {isAuthenticating ? (
+              <ActivityIndicator color={theme.colors.text} />
+            ) : null}
+          </Button>
+        </View>
       </View>
     </Screen>
   );
-}
+};
 
-const styles = StyleSheet.create({
-  column: {
-    flex: 1,
-    justifyContent: 'space-between',
-  },
-  headerBlock: {
-    alignItems: 'center',
-  },
-  googleMark: {
-    fontSize: 20,
-  },
-});
+export const WelcomeScreen = observer(WelcomeScreenView);

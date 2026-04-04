@@ -10,7 +10,12 @@ module.exports = function (api) {
           path: '.env.local',
           safe: false,
           allowUndefined: true,
-          allowlist: ['PUBLIC_SUPABASE_URL', 'PUBLIC_SUPABASE_KEY'],
+          allowlist: [
+            'PUBLIC_SUPABASE_URL',
+            'PUBLIC_SUPABASE_KEY',
+            'GOOGLE_WEB_CLIENT_ID',
+            'GOOGLE_IOS_CLIENT_ID',
+          ],
         },
       ],
       'react-native-reanimated/plugin',
