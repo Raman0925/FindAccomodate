@@ -7,7 +7,8 @@ module.exports = function (api) {
         'module:react-native-dotenv',
         {
           moduleName: '@env',
-          path: '.env.local',
+          // Must match the file you actually use (both `.env` and `.env.local` are gitignored).
+          path: '.env',
           safe: false,
           allowUndefined: true,
           allowlist: [

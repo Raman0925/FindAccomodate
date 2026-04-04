@@ -12,7 +12,7 @@ export function isSupabaseConfigured(): boolean {
 
 if (!url || !key) {
   logInfo('Supabase env missing', {
-    hint: 'Set PUBLIC_SUPABASE_URL and PUBLIC_SUPABASE_KEY in .env.local, then restart Metro with --reset-cache',
+    hint: 'Set PUBLIC_SUPABASE_URL and PUBLIC_SUPABASE_KEY in .env, then restart Metro with --reset-cache',
   });
 }
 
