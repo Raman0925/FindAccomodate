@@ -9,7 +9,7 @@ import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {AppNavigator} from './src/app/navigators';
 
 import {GluestackUIProvider} from '@/components/ui/gluestack-ui-provider';
-import '@/global.css';
+import './global.css';
 
 function App() {
   return (

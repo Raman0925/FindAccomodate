@@ -19,5 +19,17 @@ module.exports = {
       files: ['jest.setup.js', '__tests__/**/*.js', '__tests__/**/*.tsx'],
       env: {jest: true},
     },
+    {
+      files: ['**/*.js', '**/*.jsx'],
+      parser: '@babel/eslint-parser',
+      parserOptions: {
+        requireConfigFile: false,
+        babelOptions: {
+          babelrc: false,
+          configFile: false,
+          presets: [require.resolve('@babel/preset-env')],
+        },
+      },
+    },
   ],
 };

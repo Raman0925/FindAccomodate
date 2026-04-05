@@ -1,5 +1,14 @@
 import 'react-native-gesture-handler/jestSetup';
 
+jest.mock('@/components/ui/gluestack-ui-provider', () => {
+  const React = require('react');
+  const {View} = require('react-native');
+  return {
+    GluestackUIProvider: ({children, style, ...rest}) =>
+      React.createElement(View, {style: [{flex: 1}, style], ...rest}, children),
+  };
+});
+
 jest.mock('./src/app/services/supabase/client', () => {
   const subscription = {unsubscribe: jest.fn()};
   return {
