@@ -1,9 +1,5 @@
-import {types, type Instance} from 'mobx-state-tree';
-import {AuthStoreModel} from './AuthStoreModel';
-
-export const RootStoreModel = types.model('RootStore', {
-  auth: AuthStoreModel,
-});
+import {type Instance} from 'mobx-state-tree';
+import {RootStoreModel} from './RootStoreModel';
 
 export type RootStore = Instance<typeof RootStoreModel>;
 

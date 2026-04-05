@@ -1,4 +1,4 @@
-import {types} from 'mobx-state-tree';
+import {types, type Instance, type SnapshotOut} from 'mobx-state-tree';
 
 /**
  * Lightweight UI store (MobX State Tree) — same pattern as our-app singleton stores.
@@ -16,4 +16,5 @@ export const UiStoreModel = types
     },
   }));
 
-export type UiStore = typeof UiStoreModel.Type;
+export type UiStore = Instance<typeof UiStoreModel>;
+export type UiStoreSnapshot = SnapshotOut<typeof UiStoreModel>;

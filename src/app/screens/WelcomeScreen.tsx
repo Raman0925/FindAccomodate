@@ -92,7 +92,7 @@ const $welcomeColumn: ThemedStyle<ViewStyle> = () => ({
 });
 
 const $welcomeRootPadding: ThemedStyle<ViewStyle> = () => ({
-  paddingHorizontal: responsive.responsiveSpacing(spacing.lg),
+  paddingHorizontal: responsive.responsiveSpacing(spacing.xl),
   paddingTop: responsive.responsiveSpacing(spacing.xl),
   paddingBottom: responsive.responsiveSpacing(spacing.lg),
 });

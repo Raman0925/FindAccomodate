@@ -1,11 +1,28 @@
 import {createContext, useContext, useEffect, type ReactNode} from 'react';
 import {rootStore, type RootStore} from '../models/RootStore';
+import {supabase} from '../services/supabase/client';
 
 const RootStoreContext = createContext<RootStore | null>(null);
 
 export function RootStoreProvider({children}: {children: ReactNode}) {
   useEffect(() => {
-    rootStore.auth.initAuth();
+    let unsubscribe: (() => void) | undefined;
+
+    rootStore.auth
+      .initAuth()
+      .then(() => {
+        const {data} = supabase.auth.onAuthStateChange((_event, session) => {
+          rootStore.auth.applySession(session);
+        });
+        unsubscribe = () => {
+          data.subscription.unsubscribe();
+        };
+      })
+      .catch(() => {});
+
+    return () => {
+      unsubscribe?.();
+    };
   }, []);
 
   return (

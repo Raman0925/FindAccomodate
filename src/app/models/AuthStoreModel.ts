@@ -1,5 +1,5 @@
 import type {Session} from '@supabase/supabase-js';
-import {flow, types, type Instance} from 'mobx-state-tree';
+import {flow, types, type Instance, type SnapshotOut} from 'mobx-state-tree';
 import {
   configureGoogleSignIn,
   isGoogleAuthConfigured,
@@ -56,10 +56,6 @@ export const AuthStoreModel = types
           }
           const {data} = yield supabase.auth.getSession();
           syncSession(data.session ?? null);
-
-          supabase.auth.onAuthStateChange((_event, session) => {
-            syncSession(session);
-          });
         } catch {
           syncSession(null);
         } finally {
@@ -93,3 +89,4 @@ export const AuthStoreModel = types
   });
 
 export type AuthStore = Instance<typeof AuthStoreModel>;
+export type AuthStoreSnapshot = SnapshotOut<typeof AuthStoreModel>;

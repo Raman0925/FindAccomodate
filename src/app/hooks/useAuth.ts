@@ -7,15 +7,15 @@ export function useAuth() {
   const {auth} = useRootStore();
 
   const handleGoogleLogin = useCallback(() => {
-    return auth.signInWithGoogle();
+    auth.signInWithGoogle().catch(() => {});
   }, [auth]);
 
   const signOut = useCallback(() => {
-    return auth.signOut();
+    auth.signOut().catch(() => {});
   }, [auth]);
 
   const revokeGoogleAccessAndSignOut = useCallback(() => {
-    return auth.revokeGoogleAccessAndSignOut();
+    auth.revokeGoogleAccessAndSignOut().catch(() => {});
   }, [auth]);
 
   const clearAuthError = useCallback(() => {
