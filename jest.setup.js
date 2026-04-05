@@ -9,6 +9,28 @@ jest.mock('@/components/ui/gluestack-ui-provider', () => {
   };
 });
 
+// Barrel pulls ESM @gluestack-ui/utils (NativeWind); Jest uses lightweight RN stubs.
+jest.mock('@/components/ui', () => {
+  const React = require('react');
+  const {View, Text, Pressable, ActivityIndicator} = require('react-native');
+  return {
+    GluestackUIProvider: ({children, style, ...rest}) =>
+      React.createElement(View, {style: [{flex: 1}, style], ...rest}, children),
+    Box: View,
+    Button: Pressable,
+    ButtonText: Text,
+    ButtonSpinner: ActivityIndicator,
+    ButtonIcon: View,
+    ButtonGroup: View,
+    Center: View,
+    Divider: View,
+    Heading: Text,
+    HStack: View,
+    Text,
+    VStack: View,
+  };
+});
+
 jest.mock('./src/app/services/supabase/client', () => {
   const subscription = {unsubscribe: jest.fn()};
   return {

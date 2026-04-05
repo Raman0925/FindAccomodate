@@ -11,7 +11,7 @@ import {RootStoreProvider} from './src/app/providers/RootStoreProvider';
 import {name as appName} from './app.json';
 
 /** Wrap at entry so hooks like `useRootStore` always have context (even if `App.tsx` is refactored). */
-function AccoNetworkRoot() {
+function BaseraRoot() {
   return React.createElement(
     RootStoreProvider,
     null,
@@ -19,4 +19,4 @@ function AccoNetworkRoot() {
   );
 }
 
-AppRegistry.registerComponent(appName, () => AccoNetworkRoot);
+AppRegistry.registerComponent(appName, () => BaseraRoot);

@@ -29,11 +29,8 @@ export const ExploreScreen = observer(function ExploreScreen() {
             fontFamily: t.typography.bricolage.normal,
             color: t.colors.textDim,
           }))}>
-          MobX State Tree: home tab taps tracked in shared{' '}
-          <Text style={{fontFamily: theme.typography.bricolage.bold}}>
-            uiStore
-          </Text>
-          .
+          This tab will surface PG listings and people to connect with, filtered
+          by location. For now it shares a small demo counter with Home.
         </Text>
         <Text
           style={themed(t => ({
@@ -41,7 +38,7 @@ export const ExploreScreen = observer(function ExploreScreen() {
             fontFamily: t.typography.bricolage.medium,
             color: t.colors.tint,
           }))}>
-          Count: {uiStore.homeTapCount}
+          Demo taps: {uiStore.homeTapCount}
         </Text>
         <Pressable
           onPress={() => uiStore.resetHomeTaps()}

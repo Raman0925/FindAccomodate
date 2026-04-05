@@ -25,7 +25,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     window = UIWindow(frame: UIScreen.main.bounds)
 
     factory.startReactNative(
-      withModuleName: "AccoNetwork",
+      withModuleName: "Basera",
       in: window,
       launchOptions: launchOptions
     )

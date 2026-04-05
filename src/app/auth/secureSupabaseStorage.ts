@@ -1,7 +1,7 @@
 import * as Keychain from 'react-native-keychain';
 import {logInfo} from '../services/api/logger';
 
-const SERVICE = 'com.acconetwork.supabase.auth.session.v1';
+const SERVICE = 'com.basera.app.supabase.auth.session.v1';
 
 /** Safe diagnostics only: phases, counts, key *names* — never values, tokens, or raw `Error.message`. */
 type StorageFailureContext = {

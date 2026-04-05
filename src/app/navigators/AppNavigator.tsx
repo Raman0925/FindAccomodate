@@ -7,7 +7,7 @@ import {observer} from 'mobx-react-lite';
 import {useRootStore} from '../providers/RootStoreProvider';
 import {useAppTheme, useThemeProvider} from '../utils/useAppTheme';
 import type {AppStackParamList} from './AppStackParamList';
-import {DetailsScreen, WelcomeScreen} from '../screens';
+import {WelcomeScreen} from '../screens';
 import {MainTabNavigator} from './MainTabNavigator';
 
 const Stack = createNativeStackNavigator<AppStackParamList>();
@@ -34,10 +34,7 @@ const AppStack = observer(function AppStack() {
         contentStyle: {backgroundColor: colors.background},
       }}>
       {auth.isAuthenticated ? (
-        <>
-          <Stack.Screen name="MainTabs" component={MainTabNavigator} />
-          <Stack.Screen name="Details" component={DetailsScreen} />
-        </>
+        <Stack.Screen name="MainTabs" component={MainTabNavigator} />
       ) : (
         <Stack.Screen name="Welcome" component={WelcomeScreen} />
       )}

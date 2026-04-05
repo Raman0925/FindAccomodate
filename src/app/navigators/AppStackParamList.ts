@@ -5,7 +5,6 @@ import type {MainTabParamList} from './MainTabParamList';
 export type AppStackParamList = {
   Welcome: undefined;
   MainTabs: NavigatorScreenParams<MainTabParamList> | undefined;
-  Details: {title?: string};
 };
 
 export type AppStackScreenProps<T extends keyof AppStackParamList> =

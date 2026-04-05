@@ -2,11 +2,11 @@
  * Dev-only auth tracing (Metro + adb logcat). Never pass tokens or secrets here.
  *
  * How to read logs:
- * - Metro terminal: watch lines starting with `[AccoNetwork Auth]`
- * - Android: `npx react-native log-android` or Android Studio Logcat, filter `ReactNativeJS` / `AccoNetwork`
+ * - Metro terminal: watch lines starting with `[Basera Auth]`
+ * - Android: `npx react-native log-android` or Android Studio Logcat, filter `ReactNativeJS` / `Basera`
  */
 
-const TAG = '[AccoNetwork Auth]';
+const TAG = '[Basera Auth]';
 
 export function logAuthStep(
   step: string,

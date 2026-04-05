@@ -8,7 +8,7 @@ import {KeyboardProvider} from 'react-native-keyboard-controller';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {AppNavigator} from './src/app/navigators';
 
-import {GluestackUIProvider} from '@/components/ui/gluestack-ui-provider';
+import {GluestackUIProvider} from './src/components/ui/gluestack-ui-provider';
 import './global.css';
 
 function App() {

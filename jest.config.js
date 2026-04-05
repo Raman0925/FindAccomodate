@@ -7,6 +7,6 @@ module.exports = {
     '\\.css$': '<rootDir>/__mocks__/styleMock.js',
   },
   transformIgnorePatterns: [
-    'node_modules/(?!((jest-)?react-native|@react-native|@react-navigation)|react-native-screens)',
+    'node_modules/(?!((jest-)?react-native|@react-native|@react-navigation|@gluestack-ui)|react-native-screens)',
   ],
 };
