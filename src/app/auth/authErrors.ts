@@ -9,11 +9,51 @@ function isRecord(v: unknown): v is Record<string, unknown> {
   return typeof v === 'object' && v !== null;
 }
 
+/** Thrown by @supabase/auth-js when a call fails outside the `{ data, error }` path. */
+export function isSupabaseAuthThrownError(
+  e: unknown,
+): e is {message: string; name?: string} {
+  return (
+    typeof e === 'object' &&
+    e !== null &&
+    '__isAuthError' in e &&
+    typeof (e as {message?: unknown}).message === 'string'
+  );
+}
+
+function errorMessage(e: unknown): string {
+  if (e instanceof Error) {
+    return e.message;
+  }
+  if (typeof e === 'string') {
+    return e;
+  }
+  if (isRecord(e) && typeof e.message === 'string') {
+    return e.message;
+  }
+  return '';
+}
+
+/** Android ApiException 10 / DEVELOPER_ERROR — wrong SHA-1, package name, or OAuth client. */
+function isGoogleDeveloperMisconfig(e: unknown): boolean {
+  const m = errorMessage(e);
+  return /DEVELOPER_ERROR|ApiException:\s*10|code:\s*10\b/i.test(m);
+}
+
 export function mapGoogleErrorToAuthFlowError(e: unknown): AuthFlowError {
   if (e instanceof Error && e.message === AUTH_STORAGE_WRITE_CODE) {
     return {
       code: 'UNKNOWN',
       message: 'We could not save your sign-in securely. Please try again.',
+    };
+  }
+
+  if (isGoogleDeveloperMisconfig(e)) {
+    return {
+      code: 'CONFIG',
+      message: __DEV__
+        ? 'Google Sign-In setup error: add your debug/release SHA-1 and package name to the Android OAuth client in Google Cloud, and ensure GOOGLE_WEB_CLIENT_ID matches the Web client.'
+        : 'Sign-in could not be completed. Please try again later.',
     };
   }
 
@@ -42,6 +82,18 @@ export function mapGoogleErrorToAuthFlowError(e: unknown): AuthFlowError {
         message: 'Please sign in with Google again.',
       };
     }
+    if (e.code === statusCodes.NULL_PRESENTER) {
+      return {
+        code: 'UNKNOWN',
+        message: 'Could not open Google sign-in. Try again or restart the app.',
+      };
+    }
+    if (__DEV__) {
+      return {
+        code: 'UNKNOWN',
+        message: `Google Sign-In (dev): ${e.message || 'unknown'} [code: ${String(e.code)}]`,
+      };
+    }
   }
 
   if (e instanceof TypeError || (isRecord(e) && e.name === 'NetworkError')) {
@@ -51,13 +103,27 @@ export function mapGoogleErrorToAuthFlowError(e: unknown): AuthFlowError {
     };
   }
 
+  const fallbackMsg = errorMessage(e);
+  if (__DEV__ && fallbackMsg.length > 0) {
+    return {
+      code: 'UNKNOWN',
+      message: `Sign-in failed (dev): ${fallbackMsg}`,
+    };
+  }
+
   return {
     code: 'UNKNOWN',
     message: 'Something went wrong during Google sign-in. Please try again.',
   };
 }
 
-export function mapSupabaseAuthError(_message: string): AuthFlowError {
+export function mapSupabaseAuthError(message: string): AuthFlowError {
+  if (__DEV__ && message.trim().length > 0) {
+    return {
+      code: 'SUPABASE',
+      message: `Sign-in failed (dev): ${message}`,
+    };
+  }
   return {
     code: 'SUPABASE',
     message: 'We could not finish signing you in. Please try again.',

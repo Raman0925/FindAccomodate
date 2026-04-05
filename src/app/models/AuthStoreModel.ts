@@ -72,6 +72,9 @@ export const AuthStoreModel = types
           const result = yield signInWithGoogleNative();
           if (!result.ok) {
             self.friendlyAuthError = result.error.message;
+          } else {
+            const {data: sessionData} = yield supabase.auth.getSession();
+            syncSession(sessionData.session ?? null);
           }
         } finally {
           self.isAuthenticating = false;

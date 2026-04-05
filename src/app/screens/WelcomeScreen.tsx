@@ -49,8 +49,11 @@ export const WelcomeScreen = observer(function WelcomeScreen() {
   };
 
   return (
-    <Screen preset="fixed" backgroundColor={theme.colors.background}>
-      <View style={[themed($welcomeColumn), themed($welcomeRootPadding)]}>
+    <Screen
+      preset="fixed"
+      backgroundColor={theme.colors.background}
+      style={themed($container)}>
+      <View>
         <View style={themed($welcomeHeaderBlock)}>
           <Image
             source={appIcon}
@@ -58,9 +61,6 @@ export const WelcomeScreen = observer(function WelcomeScreen() {
             resizeMode="cover"
           />
           <Text style={themed($welcomeTitle)}>Welcome</Text>
-          <Text style={themed($welcomeSubtitle)}>
-            Sign in to continue to AccoNetwork
-          </Text>
         </View>
 
         <View style={themed($welcomeActions)}>
@@ -86,20 +86,15 @@ export const WelcomeScreen = observer(function WelcomeScreen() {
   );
 });
 
-const $welcomeColumn: ThemedStyle<ViewStyle> = () => ({
-  flex: 1,
-  justifyContent: 'space-between',
+const $container: ThemedStyle<ViewStyle> = () => ({
+  paddingHorizontal: responsive.responsiveSpacing({base: 16, sm: 20, md: 24}),
+  paddingTop: responsive.responsiveSpacing({base: 16, sm: 20, md: 24}),
+  paddingBottom: responsive.responsiveSpacing({base: 16, sm: 20, md: 24}),
 });
 
-const $welcomeRootPadding: ThemedStyle<ViewStyle> = () => ({
-  paddingHorizontal: responsive.responsiveSpacing(spacing.xl),
-  paddingTop: responsive.responsiveSpacing(spacing.xl),
-  paddingBottom: responsive.responsiveSpacing(spacing.lg),
-});
-
-const $welcomeHeaderBlock: ThemedStyle<ViewStyle> = ({spacing: s}) => ({
+const $welcomeHeaderBlock: ThemedStyle<ViewStyle> = ({}) => ({
   alignItems: 'center',
-  gap: s.md,
+  gap: responsive.responsiveSpacing(spacing.md),
 });
 
 const $welcomeHeroIcon: ThemedStyle<ImageStyle> = () => ({
@@ -112,13 +107,6 @@ const $welcomeTitle: ThemedStyle<TextStyle> = ({typography, colors: c}) => ({
   fontSize: responsive.responsiveFontSize({base: 26, sm: 28, md: 30}),
   fontFamily: typography.bricolage.bold,
   color: c.text,
-  textAlign: 'center',
-});
-
-const $welcomeSubtitle: ThemedStyle<TextStyle> = ({typography, colors: c}) => ({
-  fontSize: responsive.responsiveFontSize(16),
-  fontFamily: typography.bricolage.normal,
-  color: c.textDim,
   textAlign: 'center',
 });
 

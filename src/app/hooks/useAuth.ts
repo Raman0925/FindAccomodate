@@ -2,12 +2,15 @@ import {useCallback} from 'react';
 import {isGoogleAuthConfigured} from '../auth/authService';
 import {isSupabaseConfigured} from '../services/supabase/client';
 import {useRootStore} from '../providers/RootStoreProvider';
+import {logError} from '../services/api';
 
 export function useAuth() {
   const {auth} = useRootStore();
 
   const handleGoogleLogin = useCallback(() => {
-    auth.signInWithGoogle().catch(() => {});
+    auth.signInWithGoogle().catch(error => {
+      logError('useAuth', 'handleGoogleLogin', error);
+    });
   }, [auth]);
 
   const signOut = useCallback(() => {

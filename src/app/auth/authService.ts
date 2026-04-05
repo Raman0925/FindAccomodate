@@ -8,11 +8,13 @@ import {
 } from '../config/authSetupFeedback';
 import {supabase} from '../services/supabase/client';
 import {
+  isSupabaseAuthThrownError,
   mapConfigError,
   mapGoogleErrorToAuthFlowError,
   mapNoIdTokenError,
   mapSupabaseAuthError,
 } from './authErrors';
+import {logAuthFailure, logAuthStep} from './authDebug';
 import type {GoogleSignInFlowResult} from './types';
 
 let googleConfigured = false;
@@ -46,6 +48,7 @@ export function configureGoogleSignIn(): void {
  */
 export async function signInWithGoogleNative(): Promise<GoogleSignInFlowResult> {
   if (!isGoogleAuthConfigured()) {
+    logAuthStep('aborted', {reason: 'GOOGLE_WEB_CLIENT_ID missing'});
     return {
       ok: false,
       error: mapConfigError(
@@ -55,13 +58,19 @@ export async function signInWithGoogleNative(): Promise<GoogleSignInFlowResult> 
   }
 
   configureGoogleSignIn();
+  logAuthStep('start', {
+    platform: Platform.OS,
+    webClientIdLength: GOOGLE_WEB_CLIENT_ID?.trim().length ?? 0,
+  });
 
   try {
     if (Platform.OS === 'android') {
       await GoogleSignin.hasPlayServices({showPlayServicesUpdateDialog: true});
+      logAuthStep('playServices', {ok: true});
     }
 
     const response = await GoogleSignin.signIn();
+    logAuthStep('google.signIn', {type: response.type});
     if (response.type !== 'success') {
       return {
         ok: false,
@@ -73,8 +82,14 @@ export async function signInWithGoogleNative(): Promise<GoogleSignInFlowResult> 
     }
 
     const tokens = await GoogleSignin.getTokens();
-    const idToken = tokens.idToken;
+    const idToken = response.data.idToken ?? tokens.idToken;
+    logAuthStep('google.tokens', {
+      idTokenFromSignIn: Boolean(response.data.idToken),
+      idTokenFromGetTokens: Boolean(tokens.idToken),
+      hasAccessToken: Boolean(tokens.accessToken),
+    });
     if (!idToken) {
+      logAuthStep('aborted', {reason: 'no_id_token'});
       return {ok: false, error: mapNoIdTokenError()};
     }
 
@@ -85,14 +100,25 @@ export async function signInWithGoogleNative(): Promise<GoogleSignInFlowResult> 
     });
 
     if (error) {
+      logAuthStep('supabase.signInWithIdToken', {
+        message: error.message,
+        name: error.name,
+        status: (error as {status?: number}).status,
+      });
       return {
         ok: false,
         error: mapSupabaseAuthError(error.message),
       };
     }
 
+    logAuthStep('success', {supabase: 'session_created'});
     return {ok: true};
   } catch (e: unknown) {
+    logAuthFailure('signInWithGoogleNative', e);
+    // signInWithIdToken / session save can throw AuthError — not a Google NativeModuleError.
+    if (isSupabaseAuthThrownError(e)) {
+      return {ok: false, error: mapSupabaseAuthError(e.message)};
+    }
     return {ok: false, error: mapGoogleErrorToAuthFlowError(e)};
   }
 }
